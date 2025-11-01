@@ -1,0 +1,101 @@
+@startuml
+!define TABLE entity
+!define PK <<PK>>
+!define FK <<FK>>
+
+TABLE "auth.users" as auth_users {
+  * id : uuid PK
+  --
+  * email : varchar
+  * encrypted_password : varchar
+  * email_confirmed_at : timestamptz
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  * role : varchar
+}
+
+TABLE "public.user_profiles" as user_profiles {
+  * id : uuid PK
+  --
+  * user_id : uuid FK
+  * full_name : varchar
+  * phone : varchar
+  * address : text
+  * avatar_url : varchar
+  * company_name : varchar
+  * tax_code : varchar
+  * role : user_role_enum
+  * created_at : timestamptz
+  * updated_at : timestamptz
+}
+
+TABLE "public.bills" as bills {
+  * id : uuid PK
+  --
+  * account : varchar
+  * provider_id : varchar
+  * name : varchar
+  * address : text
+  * amount_current : bigint
+  * amount_previous : bigint
+  * total : bigint
+  * raw_data : jsonb
+  * created_at : timestamptz
+  * created_by : uuid FK
+}
+
+TABLE "public.warehouse_items" as warehouse_items {
+  * id : uuid PK
+  --
+  * bill_id : uuid FK
+  * imported_at : timestamptz
+  * exported_at : timestamptz
+  * imported_by : uuid FK
+  * exported_by : uuid FK
+}
+
+TABLE "public.customers" as customers {
+  * id : uuid PK
+  --
+  * name : varchar
+  * zalo : varchar
+  * bank : varchar
+  * created_at : timestamptz
+  * updated_at : timestamptz
+  * created_by : uuid FK
+}
+
+TABLE "public.transactions" as transactions {
+  * id : uuid PK
+  --
+  * bill_id : uuid FK
+  * customer_id : uuid FK
+  * employee_id : uuid FK
+  * sold_at : timestamptz
+  * amount : bigint
+  * created_at : timestamptz
+}
+
+TABLE "public.work_notes" as work_notes {
+  * id : uuid PK
+  --
+  * employee_id : uuid FK
+  * author_id : uuid FK
+  * note_text : text
+  * created_at : timestamptz
+}
+
+' Relationships
+auth_users ||--|| user_profiles : "user_profiles.user_id -> auth.users.id"
+user_profiles ||--o{ bills : "bills.created_by -> user_profiles.user_id"
+user_profiles ||--o{ warehouse_items : "warehouse_items.imported_by -> user_profiles.user_id"
+user_profiles ||--o{ warehouse_items : "warehouse_items.exported_by -> user_profiles.user_id"
+user_profiles ||--o{ customers : "customers.created_by -> user_profiles.user_id"
+user_profiles ||--o{ transactions : "transactions.employee_id -> user_profiles.user_id"
+user_profiles ||--o{ work_notes : "work_notes.employee_id -> user_profiles.user_id"
+user_profiles ||--o{ work_notes : "work_notes.author_id -> user_profiles.user_id"
+
+bills ||--o{ warehouse_items : "warehouse_items.bill_id -> bills.id"
+bills ||--o{ transactions : "transactions.bill_id -> bills.id"
+customers ||--o{ transactions : "transactions.customer_id -> customers.id"
+@enduml

@@ -1,0 +1,94 @@
+@startuml
+!define RECTANGLE class
+
+package "Client Layer" {
+  [Web Browser] as browser
+  [Mobile Browser] as mobile
+}
+
+package "CDN & Edge" {
+  [Netlify CDN] as cdn
+  [Edge Functions] as edge
+}
+
+package "Next.js Application" {
+  package "Pages & Components" {
+    [Dashboard] as dashboard
+    [Authentication] as auth_pages
+    [Bill Lookup] as lookup_page
+    [Warehouse] as warehouse_page
+    [Employee Management] as employee_page
+    [Customer Management] as customer_page
+  }
+  
+  package "API Layer" {
+    [API Routes] as api_routes
+    [Server Actions] as server_actions
+    [Middleware] as middleware
+  }
+  
+  package "Services" {
+    [Auth Service] as auth_service
+    [Bill Service] as bill_service
+    [Warehouse Service] as warehouse_service
+    [Customer Service] as customer_service
+  }
+}
+
+package "External APIs" {
+  [Cổng 1 API] as gate1_api
+  [Cổng 2 API (7ty.vn)] as gate2_api
+}
+
+package "Supabase Backend" {
+  [Supabase Auth] as supabase_auth
+  [PostgreSQL Database] as supabase_db
+  [Row Level Security] as rls
+  [Realtime] as realtime
+  [Storage] as storage
+}
+
+' Client connections
+browser --> cdn
+mobile --> cdn
+cdn --> edge
+edge --> dashboard
+
+' Page interactions
+dashboard --> auth_pages
+dashboard --> lookup_page
+dashboard --> warehouse_page
+dashboard --> employee_page
+dashboard --> customer_page
+
+' API connections
+lookup_page --> api_routes
+warehouse_page --> server_actions
+employee_page --> api_routes
+customer_page --> server_actions
+
+' Service layer
+api_routes --> auth_service
+api_routes --> bill_service
+server_actions --> warehouse_service
+server_actions --> customer_service
+
+' External API calls
+bill_service --> gate1_api
+bill_service --> gate2_api
+
+' Supabase connections
+auth_service --> supabase_auth
+warehouse_service --> supabase_db
+customer_service --> supabase_db
+employee_page --> supabase_db
+
+' Security
+supabase_auth --> rls
+rls --> supabase_db
+
+' Middleware
+middleware --> supabase_auth
+api_routes --> middleware
+server_actions --> middleware
+@enduml

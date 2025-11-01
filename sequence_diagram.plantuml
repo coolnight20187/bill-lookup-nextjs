@@ -1,0 +1,264 @@
+@startuml
+actor User
+participant "Next.js App" as App
+participant "Auth Service" as Auth
+participant "Bill Service" as BillSvc
+participant "Warehouse Service" as WarehouseSvc
+participant "Transaction Service" as TransactionSvc
+participant "Supabase DB" as DB
+participant "External API" as ExtAPI
+
+== Authentication Flow ==
+User -> App: Access Application
+App -> Auth: checkSession()
+Auth -> DB: SELECT user FROM auth.users
+DB --> Auth: User data or null
+Auth --> App: User session
+    note right
+        Output: {
+            "user": {
+                "id": "uuid",
+                "email": "string",
+                "role": "admin|user",
+                "full_name": "string"
+            }
+        }
+    end note
+
+User -> App: Login with credentials
+App -> Auth: signIn(email, password)
+    note right
+        Input: {
+            "email": "user@example.com",
+            "password": "securepassword"
+        }
+    end note
+Auth -> DB: Authenticate user
+DB --> Auth: JWT token + user data
+Auth --> App: Authentication result
+    note right
+        Output: {
+            "user": IUser,
+            "session": {
+                "access_token": "jwt_token",
+                "refresh_token": "refresh_token",
+                "expires_at": timestamp
+            }
+        }
+    end note
+
+== Bill Lookup Flow ==
+User -> App: Tra cứu hóa đơn
+App -> BillSvc: lookupBills(request)
+    note right
+        Input: {
+            "accounts": ["PB123456789012", "PA987654321098"],
+            "provider_id": "00906815"
+        }
+    end note
+
+loop For each account
+    BillSvc -> ExtAPI: Call Gate1/Gate2 API
+        note right
+            Gate 1 Request: {
+                "account": "PB123456789012",
+                "product_id": "00906815",
+                "custom_bill_amount": "",
+                "province": "",
+                "configurable": true
+            }
+        end note
+    ExtAPI --> BillSvc: Raw bill data
+        note right
+            Gate 1 Response: {
+                "data": {
+                    "account": "PB123456789012",
+                    "name": "Nguyen Van A",
+                    "address": "123 ABC Street",
+                    "bills": [
+                        {"amount": 150000},
+                        {"amount": 120000}
+                    ],
+                    "total_bill_amount": 150000
+                }
+            }
+        end note
+    BillSvc -> BillSvc: normalizeBillData()
+    BillSvc -> DB: INSERT INTO bills
+    DB --> BillSvc: Created bill record
+end
+
+BillSvc --> App: Lookup results
+    note right
+        Output: {
+            "bills": [
+                {
+                    "id": "uuid",
+                    "account": "PB123456789012",
+                    "name": "Nguyen Van A",
+                    "address": "123 ABC Street",
+                    "total": 150000,
+                    "amount_current": 150000,
+                    "amount_previous": 120000,
+                    "provider_id": "00906815"
+                }
+            ],
+            "success_count": 1,
+            "error_count": 0
+        }
+    end note
+
+== Warehouse Import Flow ==
+User -> App: Nhập bills vào kho
+App -> WarehouseSvc: importBills(request)
+    note right
+        Input: {
+            "bill_ids": ["uuid1", "uuid2"],
+            "imported_by": "user_uuid"
+        }
+    end note
+
+WarehouseSvc -> DB: BEGIN TRANSACTION
+loop For each bill_id
+    WarehouseSvc -> DB: INSERT INTO warehouse_items
+        note right
+            INSERT: {
+                "id": "new_uuid",
+                "bill_id": "uuid1",
+                "imported_at": "2024-01-01T10:00:00Z",
+                "imported_by": "user_uuid"
+            }
+        end note
+    DB --> WarehouseSvc: Warehouse item created
+end
+WarehouseSvc -> DB: COMMIT TRANSACTION
+DB --> WarehouseSvc: Transaction success
+
+WarehouseSvc --> App: Import results
+    note right
+        Output: {
+            "imported_items": [
+                {
+                    "id": "warehouse_uuid",
+                    "bill_id": "uuid1",
+                    "imported_at": "2024-01-01T10:00:00Z",
+                    "bill": {
+                        "account": "PB123456789012",
+                        "name": "Nguyen Van A",
+                        "total": 150000
+                    }
+                }
+            ],
+            "imported_count": 2
+        }
+    end note
+
+== Sales Transaction Flow ==
+User -> App: Bán hàng cho khách
+App -> TransactionSvc: createTransaction(request)
+    note right
+        Input: {
+            "bill_ids": ["uuid1", "uuid2"],
+            "customer_id": "customer_uuid",
+            "employee_id": "employee_uuid",
+            "sold_at": "2024-01-01T15:30:00Z"
+        }
+    end note
+
+TransactionSvc -> DB: BEGIN TRANSACTION
+
+' Validate bills are available
+TransactionSvc -> DB: SELECT FROM warehouse_items WHERE exported_at IS NULL
+DB --> TransactionSvc: Available warehouse items
+
+' Create transaction records
+loop For each bill
+    TransactionSvc -> DB: INSERT INTO transactions
+        note right
+            INSERT: {
+                "id": "transaction_uuid",
+                "bill_id": "uuid1",
+                "customer_id": "customer_uuid",
+                "employee_id": "employee_uuid",
+                "sold_at": "2024-01-01T15:30:00Z",
+                "amount": 150000
+            }
+        end note
+    DB --> TransactionSvc: Transaction record created
+    
+    TransactionSvc -> DB: UPDATE warehouse_items SET exported_at
+        note right
+            UPDATE: {
+                "exported_at": "2024-01-01T15:30:00Z"
+            }
+            WHERE bill_id = "uuid1"
+        end note
+    DB --> TransactionSvc: Warehouse item updated
+end
+
+TransactionSvc -> DB: COMMIT TRANSACTION
+DB --> TransactionSvc: All operations successful
+
+TransactionSvc --> App: Transaction results
+    note right
+        Output: {
+            "transactions": [
+                {
+                    "id": "transaction_uuid",
+                    "bill_id": "uuid1",
+                    "amount": 150000,
+                    "sold_at": "2024-01-01T15:30:00Z",
+                    "customer": {
+                        "id": "customer_uuid",
+                        "name": "Khach Hang A"
+                    },
+                    "employee": {
+                        "id": "employee_uuid",
+                        "full_name": "Nhan Vien B"
+                    }
+                }
+            ],
+            "total_amount": 300000,
+            "sold_count": 2
+        }
+    end note
+
+== Employee Management Flow ==
+User -> App: Quản lý nhân viên (Admin only)
+App -> Auth: checkRole('admin')
+Auth --> App: Role validation
+
+User -> App: Thêm ghi chú cho nhân viên
+App -> EmployeeSvc: addWorkNote(employee_id, author_id, note_text)
+    note right
+        Input: {
+            "employee_id": "employee_uuid",
+            "author_id": "admin_uuid",
+            "note_text": "Nhân viên hoàn thành tốt công việc tháng này"
+        }
+    end note
+
+EmployeeSvc -> DB: INSERT INTO work_notes
+    note right
+        INSERT: {
+            "id": "note_uuid",
+            "employee_id": "employee_uuid",
+            "author_id": "admin_uuid",
+            "author_username": "admin",
+            "note_text": "Nhân viên hoàn thành tốt công việc tháng này",
+            "created_at": "2024-01-01T16:00:00Z"
+        }
+    end note
+DB --> EmployeeSvc: Work note created
+
+EmployeeSvc --> App: Note creation result
+    note right
+        Output: {
+            "id": "note_uuid",
+            "employee_id": "employee_uuid",
+            "author_username": "admin",
+            "note_text": "Nhân viên hoàn thành tốt công việc tháng này",
+            "created_at": "2024-01-01T16:00:00Z"
+        }
+    end note
+@enduml
