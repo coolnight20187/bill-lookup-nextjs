@@ -2,8 +2,13 @@
 const nextConfig = {
   images: {
     domains: ['placehold.co'],
+    unoptimized: true
   },
-  // Remove env section since Next.js automatically loads from .env files
+  experimental: {
+    serverComponentsExternalPackages: ['@supabase/supabase-js']
+  },
+  // Force standalone output for deployment
+  output: 'standalone',
 }
 
 module.exports = nextConfig

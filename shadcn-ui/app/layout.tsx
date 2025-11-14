@@ -7,7 +7,7 @@ import { Toaster } from '@/components/ui/toaster'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Tra cứu Bill - Hệ thống quản lý hóa đơn điện',
+  title: 'Hệ thống Tra cứu Bill',
   description: 'Hệ thống tra cứu và quản lý hóa đơn điện hiện đại',
 }
 

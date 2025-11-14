@@ -1,11 +1,11 @@
 {
-  "timeline_index": 111,
+  "timeline_index": 145,
   "planner": {
     "Team Leader": {
       "1": {
         "task_id": "1",
         "dependent_task_ids": [],
-        "instruction": "Fix the Render.com deployment build error by removing the conflicting vite.config.ts file and any other Vite-related configurations that are causing the Next.js build to fail. The error shows that Next.js is trying to process a vite.config.ts file which contains Vite-specific imports that don't exist in a Next.js project. Need to:\n1. Check the current project structure and identify conflicting files\n2. Remove vite.config.ts and any other Vite-related files\n3. Ensure the project is properly configured for Next.js deployment on Render.com\n4. Test the build process locally\n5. Provide updated deployment instructions",
+        "instruction": "Fix the critical React Hook errors causing deployment failure on Render.com. The errors show \"useState is not a function or its return value is not iterable\" across multiple pages (/, /login, /dashboard, /_not-found). This indicates:\n1. Components are not properly importing React or using hooks incorrectly\n2. Possible client/server component mismatch in Next.js App Router\n3. Need to add \"use client\" directive to components using hooks\n4. Fix all React Hook usage patterns\n5. Ensure proper Next.js App Router component structure\n6. Test build locally and verify all pages render correctly\n7. Create a working deployment-ready version",
         "task_type": "general",
         "code": "",
         "result": "",
@@ -13,23 +13,20 @@
         "is_finished": true,
         "assignee": "Alex",
         "start_at": 1762071547.9764748,
-        "end_at": 1763096606.921358
+        "end_at": 1763102463.409273
       },
-      "current_task_id": "1",
+      "current_task_id": "2",
       "2": {
         "task_id": "2",
-        "dependent_task_ids": [
-          "1"
-        ],
-        "instruction": "Create the database schema design for Supabase, including tables for employees, members, kho (warehouse), history, and work_notes. Implement Row Level Security (RLS) policies for proper access control. Set up authentication and user roles (admin/user).",
+        "dependent_task_ids": [],
+        "instruction": "Fix the Next.js configuration error \"exportPathMap configuration cannot be used with the app directory\". Remove the conflicting exportPathMap configuration from next.config.js since we're using App Router. Ensure the configuration is compatible with Next.js 14 App Router and test the production build successfully.",
         "task_type": "general",
         "code": "",
         "result": "",
         "is_success": false,
         "is_finished": false,
-        "assignee": "David",
-        "start_at": 1761920893.7024896,
-        "end_at": 1762071547.976466
+        "assignee": "Alex",
+        "start_at": 1763102463.4092796
       },
       "3": {
         "task_id": "3",
@@ -205,7 +202,41 @@
     "108": 1,
     "109": 1,
     "110": 1,
-    "111": 1
+    "111": 1,
+    "112": 1,
+    "113": 1,
+    "114": 1,
+    "115": 1,
+    "116": 1,
+    "117": 1,
+    "118": 1,
+    "119": 1,
+    "120": 1,
+    "121": 1,
+    "122": 1,
+    "123": 1,
+    "124": 1,
+    "125": 1,
+    "126": 1,
+    "127": 1,
+    "128": 1,
+    "129": 1,
+    "130": 1,
+    "131": 1,
+    "132": 1,
+    "133": 1,
+    "134": 1,
+    "135": 1,
+    "136": 1,
+    "137": 1,
+    "138": 1,
+    "139": 1,
+    "140": 1,
+    "141": 1,
+    "142": 1,
+    "143": 1,
+    "144": 1,
+    "145": 1
   },
   "preview_servers": {},
   "preview_server": {
