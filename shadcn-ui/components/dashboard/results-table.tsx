@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -45,16 +45,7 @@ export function ResultsTable({ data, onSelectionChange, viewMode = 'lookup' }: R
   const [sortConfig, setSortConfig] = useState<{key: string, direction: 'asc' | 'desc'} | null>(null)
   const { toast } = useToast()
 
-  useEffect(() => {
-    applyFilters()
-  }, [data, searchTerm, hideZero, sortConfig])
-
-  useEffect(() => {
-    const selected = data.filter(item => selectedItems.has(item.key))
-    onSelectionChange(selected)
-  }, [selectedItems, data, onSelectionChange])
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...data]
 
     // Search filter
@@ -91,7 +82,16 @@ export function ResultsTable({ data, onSelectionChange, viewMode = 'lookup' }: R
 
     setFilteredData(filtered)
     setCurrentPage(1)
-  }
+  }, [data, searchTerm, hideZero, sortConfig])
+
+  useEffect(() => {
+    applyFilters()
+  }, [applyFilters])
+
+  useEffect(() => {
+    const selected = data.filter(item => selectedItems.has(item.key))
+    onSelectionChange(selected)
+  }, [selectedItems, data, onSelectionChange])
 
   const handleSort = (key: string) => {
     setSortConfig(current => ({

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
@@ -31,11 +31,7 @@ export function WarehouseManagement({ selectedBills, user, onWarehouseOpen }: Wa
   const [isImporting, setIsImporting] = useState(false)
   const { toast } = useToast()
 
-  useEffect(() => {
-    loadWarehousePreview()
-  }, [])
-
-  const loadWarehousePreview = async () => {
+  const loadWarehousePreview = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('warehouse')
@@ -49,7 +45,11 @@ export function WarehouseManagement({ selectedBills, user, onWarehouseOpen }: Wa
     } catch (error: any) {
       console.error('Error loading warehouse preview:', error)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadWarehousePreview()
+  }, [loadWarehousePreview])
 
   const importToWarehouse = async () => {
     if (!selectedBills.length) {
@@ -196,7 +196,7 @@ export function WarehouseManagement({ selectedBills, user, onWarehouseOpen }: Wa
               </div>
             ))}
             <div className="text-center text-sm text-muted-foreground">
-              ... nhấn "Mở KHO" để xem tất cả
+              ... nhấn &quot;Mở KHO&quot; để xem tất cả
             </div>
           </div>
         )}

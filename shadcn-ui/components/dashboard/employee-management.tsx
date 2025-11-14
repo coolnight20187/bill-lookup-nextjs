@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -41,13 +41,7 @@ export function EmployeeManagement({ user }: EmployeeManagementProps) {
     phone: "",
   })
 
-  useEffect(() => {
-    if (user.role === 'admin') {
-      loadEmployees()
-    }
-  }, [user.role])
-
-  const loadEmployees = async () => {
+  const loadEmployees = useCallback(async () => {
     setIsLoading(true)
     try {
       let query = supabase
@@ -73,7 +67,13 @@ export function EmployeeManagement({ user }: EmployeeManagementProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [searchTerm, toast])
+
+  useEffect(() => {
+    if (user.role === 'admin') {
+      loadEmployees()
+    }
+  }, [user.role, loadEmployees])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

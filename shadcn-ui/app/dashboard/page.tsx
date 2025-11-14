@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Header } from '@/components/dashboard/header'
 import { BillLookup } from '@/components/dashboard/bill-lookup'
@@ -42,11 +42,7 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<'lookup' | 'warehouse' | 'history'>('lookup')
   const router = useRouter()
 
-  useEffect(() => {
-    checkAuth()
-  }, [])
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       
@@ -80,7 +76,11 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
 
   const handleBillResults = (results: BillData[]) => {
     setBillResults(results)

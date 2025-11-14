@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -47,15 +47,7 @@ export function CustomerManagement({ user, selectedBills, onSellComplete, onHist
   const [priceFrom, setPriceFrom] = useState("")
   const [priceTo, setPriceTo] = useState("")
 
-  useEffect(() => {
-    loadMembers()
-  }, [])
-
-  useEffect(() => {
-    filterMembers()
-  }, [members, searchTerm])
-
-  const loadMembers = async () => {
+  const loadMembers = useCallback(async () => {
     setIsLoading(true)
     try {
       const { data, error } = await supabase
@@ -74,9 +66,9 @@ export function CustomerManagement({ user, selectedBills, onSellComplete, onHist
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [toast])
 
-  const filterMembers = () => {
+  const filterMembers = useCallback(() => {
     let filtered = members
     if (searchTerm) {
       filtered = members.filter(m => 
@@ -84,7 +76,15 @@ export function CustomerManagement({ user, selectedBills, onSellComplete, onHist
       )
     }
     setFilteredMembers(filtered)
-  }
+  }, [members, searchTerm])
+
+  useEffect(() => {
+    loadMembers()
+  }, [loadMembers])
+
+  useEffect(() => {
+    filterMembers()
+  }, [filterMembers])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

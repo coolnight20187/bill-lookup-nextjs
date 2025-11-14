@@ -1,196 +1,263 @@
-# Bill Lookup System - Next.js 14
+# 🔍 Hệ thống Tra cứu Hóa đơn Điện - Next.js 14
 
 Hệ thống tra cứu và quản lý hóa đơn điện hiện đại được xây dựng với Next.js 14, TypeScript, Supabase và Tailwind CSS.
 
-## ✨ Tính năng
+## ✨ Tính năng chính
 
-- 🔐 **Xác thực**: Đăng nhập bảo mật với Supabase Auth
-- 📊 **Tra cứu hóa đơn**: Truy vấn hóa đơn điện từ 2 cổng API
-- 👥 **Quản lý nhân viên**: Admin có thể quản lý nhân viên với phân quyền
-- 🏪 **Quản lý khách hàng**: Quản lý khách hàng thẻ (KHT)
-- 📦 **Hệ thống kho**: Nhập/xuất quản lý hóa đơn
-- 📈 **Lịch sử giao dịch**: Theo dõi tất cả giao dịch bán hàng
-- 📝 **Ghi chú công việc**: Hệ thống ghi chú cho nhân viên
-- 🌙 **Dark Mode**: Hỗ trợ đầy đủ theme sáng/tối
-- 📱 **Responsive**: Thiết kế responsive mobile-first
+- 🔐 **Xác thực bảo mật**: Đăng nhập với Supabase Auth và phân quyền vai trò
+- 📊 **Tra cứu đa cổng**: Hỗ trợ 2 cổng API (Cổng 1 & Cổng 2 - 7ty.vn)
+- 👥 **Quản lý nhân viên**: CRUD nhân viên với phân quyền admin/user
+- 🏪 **Quản lý khách hàng**: Quản lý khách hàng thẻ (KHT) và bán hàng
+- 📦 **Hệ thống kho**: Nhập/xuất hóa đơn với tracking đầy đủ
+- 📈 **Lịch sử giao dịch**: Theo dõi chi tiết tất cả giao dịch bán hàng
+- 📝 **Ghi chú công việc**: Hệ thống ghi chú và audit cho nhân viên
+- 🌙 **Dark/Light Mode**: Theme switching với next-themes
+- 📱 **Responsive Design**: Mobile-first với Tailwind CSS
+- 📊 **Xuất dữ liệu**: Export Excel, copy clipboard, tìm kiếm nâng cao
 
-## 🛠️ Công nghệ
+## 🛠️ Công nghệ sử dụng
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
-- **Backend**: Next.js API Routes, Supabase
-- **Database**: PostgreSQL (Supabase)
-- **Authentication**: Supabase Auth với RLS
-- **Deployment**: Netlify (khuyến nghị)
+### Frontend
+- **Next.js 14** - React framework với App Router
+- **TypeScript** - Type safety và developer experience
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - High-quality React components
+- **Lucide React** - Beautiful icons
 
-## 🚀 Bắt đầu
+### Backend & Database
+- **Next.js API Routes** - Serverless API endpoints
+- **Supabase** - PostgreSQL database với real-time capabilities
+- **Row Level Security (RLS)** - Database-level security
+- **Supabase Auth** - Authentication và authorization
 
-### Yêu cầu
+### Development & Deployment
+- **pnpm** - Fast package manager
+- **ESLint** - Code linting
+- **Render/Cloudflare Pages** - Deployment platforms
 
-- Node.js 18+ 
-- pnpm hoặc npm
+## 🚀 Cài đặt và chạy local
+
+### Yêu cầu hệ thống
+- Node.js 18+
+- pnpm 8+
 - Tài khoản Supabase
 
-### Cài đặt
-
-1. Clone repository:
+### Bước 1: Clone và cài đặt
 ```bash
 git clone <repository-url>
 cd bill-lookup-nextjs
-```
-
-2. Cài đặt dependencies:
-```bash
 pnpm install
 ```
 
-3. Thiết lập biến môi trường:
+### Bước 2: Cấu hình môi trường
 ```bash
 cp .env.example .env.local
 ```
 
-Điền thông tin Supabase và API credentials vào `.env.local`.
+Điền thông tin vào `.env.local`:
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-4. Thiết lập Supabase database:
-   - Tạo project Supabase mới
-   - Chạy các SQL scripts theo thứ tự:
-     - `/workspace/supabase_schema.sql`
-     - `/workspace/supabase_rls_policies.sql`
-     - `/workspace/supabase_auth_setup.sql`
+# API Gateway 1 (Original)
+API_BASE_URL=https://your-api-gateway-1.com
+API_GET_BILL_PATH=/api/get-bill
+API_COOKIE=your_api_cookie
+API_CSRF_TOKEN=your_csrf_token
 
-5. Chạy development server:
+# API Gateway 2 (7ty.vn)
+NEW_API_BASE_URL=https://bill.7ty.vn
+NEW_API_PATH=/api/check-electricity
+```
+
+### Bước 3: Setup Supabase Database
+1. Tạo project mới trên [Supabase](https://supabase.com)
+2. Chạy các SQL scripts theo thứ tự:
+   - `/workspace/supabase_schema.sql`
+   - `/workspace/supabase_rls_policies.sql`
+   - `/workspace/supabase_auth_setup.sql`
+
+### Bước 4: Chạy ứng dụng
 ```bash
 pnpm run dev
 ```
 
-Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt.
+Truy cập: [http://localhost:3000](http://localhost:3000)
 
-### Đăng nhập mặc định
+**Đăng nhập mặc định:**
+- Username: `admin`
+- Password: `123456`
 
-- **Username**: admin
-- **Password**: 123456
+## 📊 Cấu trúc Database
 
-## 📊 Database Schema
-
-Hệ thống sử dụng các bảng chính:
-
-- `employees` - Quản lý nhân viên với phân quyền
+### Bảng chính
+- `employees` - Quản lý nhân viên với roles
 - `members` - Khách hàng thẻ (KHT)
 - `warehouse` - Hệ thống lưu trữ hóa đơn
 - `transaction_history` - Lịch sử giao dịch bán hàng
 - `work_notes` - Ghi chú công việc nhân viên
 - `audit_log` - Nhật ký audit hệ thống
 
-## 🔗 API Routes
-
+### API Endpoints
 - `/api/get-bill` - Tra cứu hóa đơn Cổng 1
 - `/api/check-electricity` - Tra cứu hóa đơn Cổng 2 (7ty.vn)
-- Supabase xử lý tất cả các thao tác CRUD khác thông qua RLS policies
+- Supabase RLS xử lý tất cả CRUD operations khác
+
+## 🎯 Tính năng chi tiết
+
+### 1. 📊 Tra cứu Hóa đơn
+- **Đa cổng API**: Hỗ trợ 2 cổng với format khác nhau
+- **Batch processing**: Tra cứu hàng loạt với error handling
+- **Auto-deduplication**: Lọc trùng lặp tự động
+- **Real-time results**: Hiển thị kết quả progressive
+
+### 2. 📦 Quản lý Kho
+- **Import system**: Nhập hóa đơn từ kết quả tra cứu
+- **Export tracking**: Theo dõi trạng thái xuất kho
+- **Inventory management**: Quản lý tồn kho với preview
+- **Bulk operations**: Thao tác hàng loạt
+
+### 3. 👥 Quản lý Nhân viên (Admin only)
+- **CRUD operations**: Tạo, đọc, cập nhật, xóa nhân viên
+- **Role management**: Phân quyền admin/user
+- **Search & filter**: Tìm kiếm và lọc nâng cao
+- **Work notes**: Hệ thống ghi chú công việc
+- **Audit trail**: Theo dõi hoạt động
+
+### 4. 🏪 Bán hàng & Khách hàng
+- **Customer management**: Quản lý khách hàng thẻ (KHT)
+- **Sales process**: Quy trình bán hàng với tracking
+- **Transaction history**: Lịch sử giao dịch chi tiết
+- **Price filtering**: Lọc theo khoảng giá
+- **Member profiles**: Hồ sơ khách hàng với Zalo/Bank info
+
+### 5. 📋 Bảng kết quả nâng cao
+- **Multiple views**: List view và Grid view
+- **Advanced search**: Tìm kiếm đa trường
+- **Smart sorting**: Sắp xếp thông minh
+- **Pagination**: Phân trang với tùy chọn số lượng
+- **Export options**: Excel export, clipboard copy
+- **Summary statistics**: Thống kê tổng hợp
+
+## 🔒 Bảo mật
+
+### Database Level
+- **Row Level Security (RLS)** policies
+- **Role-based access control**
+- **Audit logging** cho tất cả thay đổi
+- **Input validation** và sanitization
+
+### Application Level
+- **JWT token authentication**
+- **Environment variables** protection
+- **API rate limiting**
+- **HTTPS enforcement**
 
 ## 🚀 Deployment
 
-### Netlify (Khuyến nghị)
+Xem hướng dẫn chi tiết tại: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
-1. Kết nối repository với Netlify
-2. Thiết lập biến môi trường trong Netlify dashboard
-3. Deploy với build settings:
-   - Build command: `pnpm run build`
-   - Publish directory: `.next`
+### Platforms hỗ trợ
+- **Render.com** - Recommended for full-stack apps
+- **Cloudflare Pages** - Fast global CDN
+- **Netlify** - JAMstack deployment
+- **Vercel** - Next.js optimized hosting
 
-### Biến môi trường cho Production
-
+### Build Commands
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-API_BASE_URL=your_gateway_1_url
-API_GET_BILL_PATH=/api/get-bill
-API_COOKIE=your_api_cookie
-API_CSRF_TOKEN=your_csrf_token
-NEW_API_BASE_URL=https://bill.7ty.vn
-NEW_API_PATH=/api/check-electricity
-NODE_ENV=production
+# Development
+pnpm run dev
+
+# Production build
+pnpm run build
+pnpm run start
+
+# Linting
+pnpm run lint
+pnpm run lint:fix
 ```
-
-## 🔒 Tính năng bảo mật
-
-- Row Level Security (RLS) policies
-- Kiểm soát truy cập dựa trên vai trò (admin/user)
-- Xác thực JWT token
-- Audit logging cho tất cả thay đổi
-- Validation và sanitization input
 
 ## 📁 Cấu trúc dự án
 
 ```
-/workspace/shadcn-ui/
-├── app/
-│   ├── api/                    # API routes
-│   │   ├── get-bill/          # Cổng 1 API
-│   │   └── check-electricity/ # Cổng 2 API
-│   ├── dashboard/             # Trang dashboard chính
-│   ├── login/                 # Trang đăng nhập
-│   └── layout.tsx            # Root layout
-├── components/
-│   ├── ui/                   # shadcn/ui components
-│   ├── auth/                 # Authentication components
-│   └── dashboard/            # Dashboard components
-├── lib/                      # Utilities & Supabase config
-├── package.json             # Dependencies
-└── README.md               # Documentation
+bill-lookup-nextjs/
+├── app/                    # Next.js 14 App Router
+│   ├── api/               # API routes
+│   ├── dashboard/         # Dashboard pages
+│   ├── login/            # Authentication
+│   └── layout.tsx        # Root layout
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   ├── auth/             # Auth components
+│   └── dashboard/        # Feature components
+├── lib/                  # Utilities
+│   ├── supabase.ts      # DB config
+│   └── utils.ts         # Helper functions
+├── public/               # Static assets
+└── docs/                 # Documentation
 ```
-
-## 🎯 Tính năng chính
-
-### 1. Tra cứu hóa đơn
-- Hỗ trợ 2 cổng API (Cổng 1 & Cổng 2 - 7ty.vn)
-- Tra cứu hàng loạt với xử lý lỗi
-- Lọc trùng lặp tự động
-- Hiển thị kết quả real-time
-
-### 2. Quản lý kho
-- Nhập hóa đơn vào kho
-- Xuất hóa đơn khi bán
-- Theo dõi trạng thái nhập/xuất
-- Preview kho với thống kê
-
-### 3. Quản lý nhân viên (Admin only)
-- CRUD nhân viên với phân quyền
-- Tìm kiếm và lọc
-- Ghi chú công việc
-- Audit trail
-
-### 4. Quản lý khách hàng & Bán hàng
-- Quản lý khách hàng thẻ (KHT)
-- Bán hóa đơn cho khách hàng
-- Lịch sử giao dịch chi tiết
-- Lọc theo giá trị
-
-### 5. Bảng kết quả
-- Hiển thị dạng bảng/lưới
-- Tìm kiếm, sắp xếp, phân trang
-- Xuất Excel, sao chép clipboard
-- Tổng tiền tự động
 
 ## 🔧 Development
 
-### Scripts có sẵn
-
+### Available Scripts
 ```bash
-pnpm run dev      # Chạy development server
-pnpm run build    # Build production
-pnpm run start    # Chạy production server
-pnpm run lint     # Lint code
+pnpm run dev          # Start development server
+pnpm run build        # Build for production
+pnpm run start        # Start production server
+pnpm run lint         # Run ESLint
+pnpm run lint:fix     # Fix linting issues
 ```
 
-### Thêm dependencies
+### Code Style
+- **TypeScript** strict mode
+- **ESLint** với Next.js config
+- **Prettier** formatting
+- **Conventional commits**
 
-```bash
-pnpm add package_name
-```
+## 📈 Performance
 
-## 📝 License
+### Optimizations
+- **Next.js 14** App Router với Server Components
+- **Static generation** cho public pages
+- **Image optimization** với next/image
+- **Bundle analysis** và code splitting
+- **Caching strategies** với Supabase
 
-Đây là phần mềm độc quyền. Mọi quyền được bảo lưu.
+### Monitoring
+- **Supabase Analytics** cho database
+- **Platform analytics** (Render/Cloudflare)
+- **Error tracking** với built-in logging
+- **Performance metrics** monitoring
+
+## 🤝 Contributing
+
+1. Fork repository
+2. Tạo feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Tạo Pull Request
+
+### Development Guidelines
+- Follow TypeScript best practices
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation
+- Ensure responsive design
+
+## 📄 License
+
+Dự án này là phần mềm độc quyền. Mọi quyền được bảo lưu.
+
+## 🆘 Support & Documentation
+
+- **Deployment Guide**: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+- **API Documentation**: Xem comments trong code
+- **Database Schema**: `/workspace/supabase_*.sql`
+- **Component Library**: [shadcn/ui docs](https://ui.shadcn.com)
 
 ---
 
-**Lưu ý**: Đây là phiên bản hiện đại hóa hoàn toàn từ hệ thống Express.js cũ, với cải tiến về hiệu suất, bảo mật và trải nghiệm người dùng.
+**Phiên bản hiện đại hóa hoàn toàn từ Express.js legacy system** 🚀
+
+Built with ❤️ using Next.js 14, TypeScript, Supabase & Tailwind CSS
