@@ -1,8 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  trailingSlash: false,
   experimental: {
     serverComponentsExternalPackages: ['@supabase/supabase-js']
+  },
+  async generateBuildId() {
+    return 'build-' + Date.now()
   },
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

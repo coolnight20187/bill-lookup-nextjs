@@ -2,14 +2,16 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
-import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Hệ thống Tra cứu Bill',
-  description: 'Hệ thống tra cứu và quản lý hóa đơn điện hiện đại',
+  title: 'Bill Lookup System',
+  description: 'Hệ thống tra cứu hóa đơn điện',
 }
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default function RootLayout({
   children,
@@ -26,7 +28,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster />
         </ThemeProvider>
       </body>
     </html>
