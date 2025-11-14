@@ -2,7 +2,7 @@
     "tabs": {
         "00": {
             "tab_id": "00",
-            "cwd": "/workspace",
+            "cwd": "/workspace/shadcn-ui",
             "observer": {
                 "block": "Terminal",
                 "uuid": "ce40bbfd-ca3f-462a-bcd4-1ce8b4a51247",
@@ -13,9 +13,23 @@
                 "bash"
             ],
             "command_terminator": "\n"
+        },
+        "01": {
+            "tab_id": "01",
+            "cwd": "/workspace/shadcn-ui",
+            "observer": {
+                "block": "Terminal",
+                "uuid": "911fe215-ed0c-4ebd-8cc5-e6b17f371647",
+                "enable_llm_stream": false,
+                "callback_url": ""
+            },
+            "shell_command": [
+                "bash"
+            ],
+            "command_terminator": "\n"
         }
     },
-    "current_tab_id": "00",
+    "current_tab_id": "01",
     "forbidden_commands": {
         "run preview": "Use Deployer.deploy_to_public instead.",
         "serve ": "Use Deployer.deploy_to_public instead.",

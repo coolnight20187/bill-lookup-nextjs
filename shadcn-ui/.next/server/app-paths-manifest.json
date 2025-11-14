@@ -1,8 +1,4 @@
 {
-  "/_not-found": "app/_not-found.js",
-  "/api/check-electricity/route": "app/api/check-electricity/route.js",
-  "/api/get-bill/route": "app/api/get-bill/route.js",
   "/page": "app/page.js",
-  "/login/page": "app/login/page.js",
   "/dashboard/page": "app/dashboard/page.js"
 }

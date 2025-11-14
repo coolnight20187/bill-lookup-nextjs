@@ -1,102 +1,102 @@
-# Bill Lookup System - Next.js
+# Bill Lookup System - Next.js 14
 
-A modern bill lookup and management system built with Next.js 14, TypeScript, Supabase, and Tailwind CSS.
+Hệ thống tra cứu và quản lý hóa đơn điện hiện đại được xây dựng với Next.js 14, TypeScript, Supabase và Tailwind CSS.
 
-## Features
+## ✨ Tính năng
 
-- 🔐 **Authentication**: Secure login with Supabase Auth
-- 📊 **Bill Lookup**: Query electricity bills from multiple API gateways
-- 👥 **Employee Management**: Admin can manage employees with roles
-- 🏪 **Customer Management**: Manage card customers (KHT)
-- 📦 **Warehouse System**: Import/export bill management
-- 📈 **Transaction History**: Track all sales and transactions
-- 📝 **Work Notes**: Employee work notes system
-- 🌙 **Dark Mode**: Full dark/light theme support
-- 📱 **Responsive**: Mobile-first responsive design
+- 🔐 **Xác thực**: Đăng nhập bảo mật với Supabase Auth
+- 📊 **Tra cứu hóa đơn**: Truy vấn hóa đơn điện từ 2 cổng API
+- 👥 **Quản lý nhân viên**: Admin có thể quản lý nhân viên với phân quyền
+- 🏪 **Quản lý khách hàng**: Quản lý khách hàng thẻ (KHT)
+- 📦 **Hệ thống kho**: Nhập/xuất quản lý hóa đơn
+- 📈 **Lịch sử giao dịch**: Theo dõi tất cả giao dịch bán hàng
+- 📝 **Ghi chú công việc**: Hệ thống ghi chú cho nhân viên
+- 🌙 **Dark Mode**: Hỗ trợ đầy đủ theme sáng/tối
+- 📱 **Responsive**: Thiết kế responsive mobile-first
 
-## Tech Stack
+## 🛠️ Công nghệ
 
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
 - **Backend**: Next.js API Routes, Supabase
 - **Database**: PostgreSQL (Supabase)
-- **Authentication**: Supabase Auth with RLS
-- **Deployment**: Netlify (recommended)
+- **Authentication**: Supabase Auth với RLS
+- **Deployment**: Netlify (khuyến nghị)
 
-## Getting Started
+## 🚀 Bắt đầu
 
-### Prerequisites
+### Yêu cầu
 
 - Node.js 18+ 
-- npm or yarn
-- Supabase account
+- pnpm hoặc npm
+- Tài khoản Supabase
 
-### Installation
+### Cài đặt
 
-1. Clone the repository:
+1. Clone repository:
 ```bash
 git clone <repository-url>
 cd bill-lookup-nextjs
 ```
 
-2. Install dependencies:
+2. Cài đặt dependencies:
 ```bash
-npm install
+pnpm install
 ```
 
-3. Set up environment variables:
+3. Thiết lập biến môi trường:
 ```bash
 cp .env.example .env.local
 ```
 
-Fill in your Supabase and API credentials in `.env.local`.
+Điền thông tin Supabase và API credentials vào `.env.local`.
 
-4. Set up Supabase database:
-   - Create a new Supabase project
-   - Run the SQL scripts in order:
+4. Thiết lập Supabase database:
+   - Tạo project Supabase mới
+   - Chạy các SQL scripts theo thứ tự:
      - `/workspace/supabase_schema.sql`
      - `/workspace/supabase_rls_policies.sql`
      - `/workspace/supabase_auth_setup.sql`
 
-5. Run the development server:
+5. Chạy development server:
 ```bash
-npm run dev
+pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt.
 
-### Default Login
+### Đăng nhập mặc định
 
 - **Username**: admin
 - **Password**: 123456
 
-## Database Schema
+## 📊 Database Schema
 
-The system uses the following main tables:
+Hệ thống sử dụng các bảng chính:
 
-- `employees` - Employee management with roles
-- `members` - Card customers (KHT)
-- `warehouse` - Bill storage system
-- `transaction_history` - Sales transaction records
-- `work_notes` - Employee work notes
-- `audit_log` - System audit trail
+- `employees` - Quản lý nhân viên với phân quyền
+- `members` - Khách hàng thẻ (KHT)
+- `warehouse` - Hệ thống lưu trữ hóa đơn
+- `transaction_history` - Lịch sử giao dịch bán hàng
+- `work_notes` - Ghi chú công việc nhân viên
+- `audit_log` - Nhật ký audit hệ thống
 
-## API Routes
+## 🔗 API Routes
 
-- `/api/get-bill` - Gateway 1 bill lookup
-- `/api/check-electricity` - Gateway 2 bill lookup (7ty.vn)
-- Supabase handles all other CRUD operations via RLS policies
+- `/api/get-bill` - Tra cứu hóa đơn Cổng 1
+- `/api/check-electricity` - Tra cứu hóa đơn Cổng 2 (7ty.vn)
+- Supabase xử lý tất cả các thao tác CRUD khác thông qua RLS policies
 
-## Deployment
+## 🚀 Deployment
 
-### Netlify (Recommended)
+### Netlify (Khuyến nghị)
 
-1. Connect your repository to Netlify
-2. Set environment variables in Netlify dashboard
-3. Deploy with these build settings:
-   - Build command: `npm run build`
+1. Kết nối repository với Netlify
+2. Thiết lập biến môi trường trong Netlify dashboard
+3. Deploy với build settings:
+   - Build command: `pnpm run build`
    - Publish directory: `.next`
 
-### Environment Variables for Production
+### Biến môi trường cho Production
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -110,22 +110,87 @@ NEW_API_PATH=/api/check-electricity
 NODE_ENV=production
 ```
 
-## Security Features
+## 🔒 Tính năng bảo mật
 
 - Row Level Security (RLS) policies
-- Role-based access control (admin/user)
-- JWT token authentication
-- Audit logging for all changes
-- Input validation and sanitization
+- Kiểm soát truy cập dựa trên vai trò (admin/user)
+- Xác thực JWT token
+- Audit logging cho tất cả thay đổi
+- Validation và sanitization input
 
-## Contributing
+## 📁 Cấu trúc dự án
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+```
+/workspace/shadcn-ui/
+├── app/
+│   ├── api/                    # API routes
+│   │   ├── get-bill/          # Cổng 1 API
+│   │   └── check-electricity/ # Cổng 2 API
+│   ├── dashboard/             # Trang dashboard chính
+│   ├── login/                 # Trang đăng nhập
+│   └── layout.tsx            # Root layout
+├── components/
+│   ├── ui/                   # shadcn/ui components
+│   ├── auth/                 # Authentication components
+│   └── dashboard/            # Dashboard components
+├── lib/                      # Utilities & Supabase config
+├── package.json             # Dependencies
+└── README.md               # Documentation
+```
 
-## License
+## 🎯 Tính năng chính
 
-This project is proprietary software. All rights reserved.
+### 1. Tra cứu hóa đơn
+- Hỗ trợ 2 cổng API (Cổng 1 & Cổng 2 - 7ty.vn)
+- Tra cứu hàng loạt với xử lý lỗi
+- Lọc trùng lặp tự động
+- Hiển thị kết quả real-time
+
+### 2. Quản lý kho
+- Nhập hóa đơn vào kho
+- Xuất hóa đơn khi bán
+- Theo dõi trạng thái nhập/xuất
+- Preview kho với thống kê
+
+### 3. Quản lý nhân viên (Admin only)
+- CRUD nhân viên với phân quyền
+- Tìm kiếm và lọc
+- Ghi chú công việc
+- Audit trail
+
+### 4. Quản lý khách hàng & Bán hàng
+- Quản lý khách hàng thẻ (KHT)
+- Bán hóa đơn cho khách hàng
+- Lịch sử giao dịch chi tiết
+- Lọc theo giá trị
+
+### 5. Bảng kết quả
+- Hiển thị dạng bảng/lưới
+- Tìm kiếm, sắp xếp, phân trang
+- Xuất Excel, sao chép clipboard
+- Tổng tiền tự động
+
+## 🔧 Development
+
+### Scripts có sẵn
+
+```bash
+pnpm run dev      # Chạy development server
+pnpm run build    # Build production
+pnpm run start    # Chạy production server
+pnpm run lint     # Lint code
+```
+
+### Thêm dependencies
+
+```bash
+pnpm add package_name
+```
+
+## 📝 License
+
+Đây là phần mềm độc quyền. Mọi quyền được bảo lưu.
+
+---
+
+**Lưu ý**: Đây là phiên bản hiện đại hóa hoàn toàn từ hệ thống Express.js cũ, với cải tiến về hiệu suất, bảo mật và trải nghiệm người dùng.
