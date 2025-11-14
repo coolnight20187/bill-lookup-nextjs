@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_BASE_URL = process.env.API_BASE_URL!
-const API_GET_BILL_PATH = process.env.API_GET_BILL_PATH!
-const API_COOKIE = process.env.API_COOKIE!
-const API_CSRF_TOKEN = process.env.API_CSRF_TOKEN!
+const API_BASE_URL = process.env.API_BASE_URL || 'https://placeholder-api-1.com'
+const API_GET_BILL_PATH = process.env.API_GET_BILL_PATH || '/api/get-bill'
+const API_COOKIE = process.env.API_COOKIE || 'placeholder-cookie'
+const API_CSRF_TOKEN = process.env.API_CSRF_TOKEN || 'placeholder-csrf-token'
 
 function nowSec() {
   return Math.floor(Date.now() / 1000).toString()

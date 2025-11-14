@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const NEW_API_BASE_URL = process.env.NEW_API_BASE_URL!
-const NEW_API_PATH = process.env.NEW_API_PATH!
+const NEW_API_BASE_URL = process.env.NEW_API_BASE_URL || 'https://bill.7ty.vn'
+const NEW_API_PATH = process.env.NEW_API_PATH || '/api/check-electricity'
 
 export async function POST(request: NextRequest) {
   try {
