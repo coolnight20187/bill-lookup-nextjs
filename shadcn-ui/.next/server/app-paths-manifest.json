@@ -1,14 +1,5 @@
 {
-  "/page": "app/page.js",
-  "/api/auth/session/route": "app/api/auth/session/route.js",
-  "/not-found": "app/not-found.js",
   "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/api/auth/logout/route": "app/api/auth/logout/route.js",
-  "/_not-found": "app/_not-found.js",
-  "/api/check-electricity/route": "app/api/check-electricity/route.js",
-  "/api/warehouse/import/route": "app/api/warehouse/import/route.js",
-  "/login/page": "app/login/page.js",
-  "/api/get-bill/route": "app/api/get-bill/route.js",
-  "/api/warehouse/list/route": "app/api/warehouse/list/route.js"
+  "/page": "app/page.js",
+  "/api/auth/session/route": "app/api/auth/session/route.js"
 }
