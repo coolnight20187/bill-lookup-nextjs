@@ -29,7 +29,7 @@ pnpm run start
 ```bash
 cd /workspace/shadcn-ui
 
-# Khởi tạo git
+# Khởi tạo git (nếu chưa có)
 git init
 git add .
 git commit -m "Initial commit: Next.js 14 bill lookup system"
@@ -94,10 +94,11 @@ Region: Singapore (gần VN nhất)
 Branch: main
 Build Command: pnpm install && pnpm run build
 Start Command: pnpm start
+Node Version: 18 (hoặc 20)
 ```
 
 ### 3A.3 Environment Variables
-Thêm các biến môi trường:
+Thêm các biến môi trường trong Render Dashboard:
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -115,6 +116,13 @@ NODE_ENV=production
 2. Chờ build và deploy (5-10 phút)
 3. Kiểm tra logs nếu có lỗi
 
+### 3A.5 Troubleshooting Render
+Nếu build fail:
+1. **Vite config conflict**: Đảm bảo không có `vite.config.ts` trong project
+2. **Node version**: Đặt Node version 18 hoặc 20 trong Render settings
+3. **Build command**: Sử dụng `pnpm install && pnpm run build`
+4. **Start command**: Sử dụng `pnpm start`
+
 ## 🌐 BƯỚC 3B: Deploy lên Cloudflare Pages
 
 ### 3B.1 Tạo Pages Project
@@ -128,6 +136,7 @@ Framework preset: Next.js
 Build command: pnpm install && pnpm run build
 Build output directory: .next
 Root directory: /
+Node.js version: 18
 ```
 
 ### 3B.3 Environment Variables
@@ -148,6 +157,32 @@ NODE_ENV=production
 1. Save and Deploy
 2. Chờ build hoàn thành
 3. Truy cập URL được cung cấp
+
+## 🌐 BƯỚC 3C: Deploy lên Vercel (Alternative)
+
+### 3C.1 Vercel CLI
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+cd /workspace/shadcn-ui
+vercel
+
+# Follow prompts:
+# - Link to existing project? No
+# - Project name: bill-lookup-nextjs
+# - Directory: ./
+# - Override settings? No
+```
+
+### 3C.2 Environment Variables
+```bash
+# Add environment variables
+vercel env add NEXT_PUBLIC_SUPABASE_URL
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY
+# ... add all other variables
+```
 
 ## ⚙️ BƯỚC 4: Cấu hình sau Deploy
 
@@ -178,15 +213,22 @@ VALUES ('your-admin', '$2b$10$hashed-password', 'admin', 'Your Name', true);
    pnpm install --frozen-lockfile
    ```
 
-2. **"Environment variables not found"**
+2. **"Vite config found"**
+   - Xóa `vite.config.ts` và `vite-env.d.ts`
+   - Chỉ giữ `next.config.js`
+
+3. **"BigInt literals not available"**
+   - Cập nhật `tsconfig.json` target thành `ES2020`
+
+4. **"Environment variables not found"**
    - Kiểm tra tên biến môi trường
    - Đảm bảo có prefix `NEXT_PUBLIC_` cho client-side
 
-3. **"Supabase connection failed"**
+5. **"Supabase connection failed"**
    - Kiểm tra URL và API key
    - Đảm bảo RLS policies đã được tạo
 
-4. **"API routes not working"**
+6. **"API routes not working"**
    - Kiểm tra API credentials
    - Test API endpoints riêng lẻ
 
@@ -199,6 +241,10 @@ VALUES ('your-admin', '$2b$10$hashed-password', 'admin', 'Your Name', true);
 2. **Render (nếu dùng)**
    - Upgrade plan nếu cần
    - Cấu hình health checks
+
+3. **Vercel (nếu dùng)**
+   - Sử dụng Edge Runtime cho API routes
+   - Optimize images với next/image
 
 ## 📱 BƯỚC 5: Mobile & PWA (Tùy chọn)
 
@@ -252,13 +298,15 @@ pnpm add next-pwa
 - Check error logs
 
 ### 7.2 Application Monitoring
-- Render/Cloudflare analytics
+- Platform analytics (Render/Cloudflare/Vercel)
 - Error tracking với Sentry (tùy chọn)
 - Performance monitoring
 
 ## 🎯 Checklist Deploy
 
 - [ ] Code đã push lên GitHub
+- [ ] Không có file `vite.config.ts` trong project
+- [ ] `tsconfig.json` target ES2020
 - [ ] Supabase database đã setup
 - [ ] Environment variables đã cấu hình
 - [ ] Build thành công local
@@ -280,6 +328,11 @@ Nếu gặp vấn đề:
 3. Kiểm tra Supabase logs
 4. Review environment variables
 5. Tham khảo documentation của từng service
+
+### Lỗi Render.com cụ thể:
+- **Build failed với Vite error**: Xóa tất cả file liên quan đến Vite
+- **Node version mismatch**: Đặt Node 18 trong Render settings
+- **pnpm not found**: Sử dụng `npm` thay vì `pnpm` nếu cần
 
 ---
 

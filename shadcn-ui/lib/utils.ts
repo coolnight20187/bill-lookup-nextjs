@@ -5,34 +5,32 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatMoney(value: string | number): string {
-  const digits = (value ?? '').toString().replace(/\D/g, '');
-  if (!digits) return '0 ₫';
+export function formatMoney(amount: string | number): string {
+  const digits = String(amount).replace(/\D/g, '')
+  if (!digits) return '0 ₫'
   try {
-    const amount = BigInt(digits) / 100000n;
-    return amount.toLocaleString('vi-VN') + ' ₫';
+    const numAmount = Number(digits) / 100000
+    return numAmount.toLocaleString('vi-VN') + ' ₫'
   } catch {
-    return Math.floor(Number(digits) / 100000)
-      .toLocaleString('vi-VN') + ' ₫';
+    return Math.floor(Number(digits) / 100000).toLocaleString('vi-VN') + ' ₫'
   }
 }
 
-export function formatDate(isoString: string | null): string {
-  if (!isoString) return '';
+export function parseMoney(amount: string): number {
+  const digits = String(amount).replace(/\D/g, '')
+  return parseInt(digits) || 0
+}
+
+export function formatDate(dateString: string): string {
   try {
-    const d = new Date(isoString);
-    return d.toLocaleString('vi-VN', {
-      day: '2-digit', 
-      month: '2-digit', 
+    return new Date(dateString).toLocaleDateString('vi-VN', {
       year: 'numeric',
-      hour: '2-digit', 
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
       minute: '2-digit'
-    });
-  } catch { 
-    return isoString; 
+    })
+  } catch {
+    return dateString
   }
-}
-
-export function parseMoney(s: string | number): number {
-  return parseInt((s + '').replace(/\D/g, ''), 10) || 0;
 }
