@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 const API_BASE_URL = process.env.API_BASE_URL || 'https://placeholder-api-1.com'
 const API_GET_BILL_PATH = process.env.API_GET_BILL_PATH || '/api/get-bill'
 const API_COOKIE = process.env.API_COOKIE || 'placeholder-cookie'

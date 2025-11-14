@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 const NEW_API_BASE_URL = process.env.NEW_API_BASE_URL || 'https://bill.7ty.vn'
 const NEW_API_PATH = process.env.NEW_API_PATH || '/api/check-electricity'
 
