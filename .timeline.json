@@ -1,5 +1,5 @@
 {
-  "timeline_index": 274,
+  "timeline_index": 294,
   "planner": {
     "Team Leader": {
       "1": {
@@ -15,7 +15,7 @@
         "start_at": 1762071547.9764748,
         "end_at": 1763102463.409273
       },
-      "current_task_id": "4",
+      "current_task_id": "5",
       "2": {
         "task_id": "2",
         "dependent_task_ids": [],
@@ -53,7 +53,20 @@
         "is_finished": true,
         "assignee": "Alex",
         "start_at": 1763111805.7923443,
-        "end_at": 1763112481.8606722
+        "end_at": 1763115649.848135
+      },
+      "5": {
+        "task_id": "5",
+        "dependent_task_ids": [],
+        "instruction": "Tạo script tạo tài khoản admin và hướng dẫn user khắc phục vấn đề đăng nhập admin. Cần:\n\n1. Tạo script setup-admin.js để tạo tài khoản admin mặc định\n2. Kiểm tra và fix authentication system nếu cần\n3. Tạo hướng dẫn step-by-step cho user tạo admin account\n4. Đảm bảo password được hash đúng cách với bcrypt\n5. Test login functionality với tài khoản admin mới\n\nTài khoản admin mặc định:\n- Username: admin\n- Password: 123456\n- Role: admin\n- Full name: Administrator\n\nCung cấp multiple options cho user: script tự động, manual SQL commands, và troubleshooting guide.",
+        "task_type": "general",
+        "code": "",
+        "result": "",
+        "is_success": false,
+        "is_finished": true,
+        "assignee": "Alex",
+        "start_at": 1763115649.8481426,
+        "end_at": 1763116030.4938197
       }
     },
     "Data Analyst": {
@@ -378,7 +391,27 @@
     "271": 1,
     "272": 1,
     "273": 1,
-    "274": 1
+    "274": 1,
+    "275": 1,
+    "276": 1,
+    "277": 1,
+    "278": 1,
+    "279": 1,
+    "280": 1,
+    "281": 1,
+    "282": 1,
+    "283": 1,
+    "284": 1,
+    "285": 1,
+    "286": 1,
+    "287": 1,
+    "288": 1,
+    "289": 1,
+    "290": 1,
+    "291": 1,
+    "292": 1,
+    "293": 1,
+    "294": 1
   },
   "preview_servers": {},
   "preview_server": {
