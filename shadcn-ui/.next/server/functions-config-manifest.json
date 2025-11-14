@@ -1,0 +1,1 @@
+{"version":1,"functions":{"/api/auth/logout":{},"/api/auth/session":{},"/api/auth/login":{},"/_not-found":{},"/api/check-electricity":{},"/api/get-bill":{},"/login":{},"/":{},"/api/warehouse/list":{},"/api/warehouse/import":{},"/dashboard":{}}}

@@ -1,14 +1,15 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
-import { Search, Filter, Loader2 } from "lucide-react"
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, Search, Filter, Zap } from 'lucide-react'
+import { formatMoney, formatDate } from '@/lib/utils'
 
 interface BillData {
   key: string
@@ -19,26 +20,26 @@ interface BillData {
   amount_previous: string
   total: string
   provider_id: string
-  raw_data: any
+  raw: any
 }
 
 interface BillLookupProps {
   onResults: (results: BillData[]) => void
 }
 
-const PROVIDERS = [
-  { value: "00906815", label: "Điện lực miền Nam" },
-  { value: "00906819", label: "Điện lực miền Bắc" },
-  { value: "00906818", label: "Điện EVNHCMC" },
-  { value: "00906820", label: "Điện EVN Hà Nội" },
-  { value: "00906817", label: "Điện An Giang" },
-]
-
 export function BillLookup({ onResults }: BillLookupProps) {
-  const [provider, setProvider] = useState("00906815")
-  const [accounts, setAccounts] = useState("")
+  const [provider, setProvider] = useState('00906815')
+  const [accounts, setAccounts] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+  const [error, setError] = useState('')
+
+  const providers = [
+    { value: '00906815', label: 'Điện lực miền Nam' },
+    { value: '00906819', label: 'Điện lực miền Bắc' },
+    { value: '00906818', label: 'Điện EVNHCMC' },
+    { value: '00906820', label: 'Điện EVN Hà Nội' },
+    { value: '00906817', label: 'Điện An Giang' }
+  ]
 
   const handleFilterDuplicates = () => {
     const lines = accounts.split('\n')
@@ -47,122 +48,193 @@ export function BillLookup({ onResults }: BillLookupProps) {
     setAccounts(lines.join('\n'))
   }
 
+  const normalizeResponse = (response: any, account: string, providerId: string): BillData => {
+    const data = response.data || {}
+    const bills = Array.isArray(data.bills) ? data.bills : []
+    const curr = Number(data.statement_closing || bills[0]?.amount || 0)
+    const prev = Number(bills[1]?.amount || 0)
+    const total = Number(data.total_bill_amount || curr)
+
+    return {
+      key: `${providerId}::${account}`,
+      account: data.account || account,
+      name: data.name || '-',
+      address: data.address || '-',
+      amount_current: String(curr),
+      amount_previous: String(prev),
+      total: String(total),
+      provider_id: providerId,
+      raw: data
+    }
+  }
+
+  const normalizeResponsePort2 = (response: any, account: string): BillData => {
+    const providerId = 'C2-7ty.vn'
+    
+    if (response.success && response.data?.success && response.data.data?.bills) {
+      if (response.data.data.bills.length > 0) {
+        const bill = response.data.data.bills[0]
+        return {
+          key: `${providerId}::${account}`,
+          account,
+          name: bill.customerName || '-',
+          address: bill.address || '-',
+          amount_current: String(bill.moneyAmount || 0),
+          amount_previous: '0',
+          total: String(bill.moneyAmount || 0),
+          provider_id: providerId,
+          raw: response.data.data
+        }
+      } else {
+        return {
+          key: `${providerId}::${account}`,
+          account,
+          name: `(Mã ${account})`,
+          address: 'Không nợ cước',
+          amount_current: '0',
+          amount_previous: '0',
+          total: '0',
+          provider_id: providerId,
+          raw: response.data.data
+        }
+      }
+    }
+
+    // Error case
+    let errorMsg = response.error?.message || response.details || 'Lỗi tra cứu C2'
+    if (response.data?.error) {
+      errorMsg = response.data.error.message || 'Lỗi không xác định C2'
+    }
+    if (response.error && (response.error.code === 'PAYBILL_QUERY_ERROR-01' || response.error === 'Khách hàng không nợ cước')) {
+      errorMsg = "Không nợ cước"
+    }
+
+    return {
+      key: `${providerId}::${account}`,
+      account,
+      name: `(Mã ${account})`,
+      address: errorMsg,
+      amount_current: '0',
+      amount_previous: '0',
+      total: '0',
+      provider_id: providerId,
+      raw: { error: errorMsg }
+    }
+  }
+
   const handleLookup = async () => {
     const codes = accounts.split('\n')
       .map(s => s.trim())
       .filter(s => s.length > 5)
 
     if (!codes.length) {
-      toast({
-        title: "Lỗi",
-        description: "Vui lòng nhập mã khách hàng.",
-        variant: "destructive",
-      })
+      setError('Vui lòng nhập mã khách hàng.')
       return
     }
 
     setIsLoading(true)
+    setError('')
     const results: BillData[] = []
 
     try {
-      // Check if provider is Port 2 (8 digits) or Port 1 (PB format)
+      // Check if using Gateway 2 (numeric SKU)
       const isPort2 = /^\d{8}$/.test(provider)
 
-      for (let i = 0; i < codes.length; i++) {
-        const code = codes[i]
-        
-        try {
-          let response
-          if (isPort2) {
-            // Port 2 API call
-            response = await fetch('/api/check-electricity', {
+      if (isPort2) {
+        // Gateway 2 logic
+        for (let i = 0; i < codes.length; i++) {
+          try {
+            const response = await fetch('/api/check-electricity', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                contract_number: code,
+                contract_number: codes[i],
                 sku: provider
-              }),
+              })
             })
-          } else {
-            // Port 1 API call
-            if (!/^P[A-Z0-9]{12}$/i.test(code)) {
-              throw new Error('Mã không hợp lệ cho Cổng 1 (phải là PB...)')
-            }
-            
-            response = await fetch('/api/get-bill', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                account: code.toUpperCase(),
-                product_id: provider
-              }),
-            })
+
+            const data = await response.json()
+            const normalized = normalizeResponsePort2(data, codes[i])
+            results.push(normalized)
+          } catch (err: any) {
+            console.error(`Error looking up ${codes[i]}:`, err)
+            results.push(normalizeResponsePort2({ error: { message: err.message } }, codes[i]))
           }
 
-          if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || `Lỗi ${response.status}`)
-          }
-
-          const data = await response.json()
+          // Update results progressively
+          onResults([...results])
           
-          // Normalize response based on port
-          let normalized: BillData
-          if (isPort2) {
-            normalized = normalizePort2Response(data, code, provider)
-          } else {
-            normalized = normalizePort1Response(data, code, provider)
+          if (i < codes.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500))
           }
-          
-          results.push(normalized)
-        } catch (error: any) {
-          console.error(`Error looking up ${code}:`, error)
-          results.push({
-            key: `${provider}::${code}`,
-            account: code,
-            name: `(Mã ${code})`,
-            address: error.message,
-            amount_current: '0',
-            amount_previous: '0',
-            total: '0',
-            provider_id: provider,
-            raw_data: { error: error.message }
-          })
+        }
+      } else {
+        // Gateway 1 logic
+        const port1Codes = codes.filter(s => /^P[A-Z0-9]{12}$/i.test(s))
+        
+        if (codes.length > 0 && port1Codes.length === 0) {
+          setError('Các mã bạn nhập không hợp lệ cho Gateway 1 (phải là PB...).')
+          return
         }
 
-        // Update results progressively
-        onResults([...results])
-        
-        if (i < codes.length - 1) {
-          // Add delay between requests
-          await new Promise(resolve => setTimeout(resolve, isPort2 ? 500 : 2000))
+        for (let i = 0; i < port1Codes.length; i++) {
+          try {
+            const response = await fetch('/api/get-bill', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                account: port1Codes[i].toUpperCase(),
+                product_id: provider
+              })
+            })
+
+            const data = await response.json()
+            const normalized = normalizeResponse(data, port1Codes[i], provider)
+            results.push(normalized)
+          } catch (err: any) {
+            console.error(`Error looking up ${port1Codes[i]}:`, err)
+            results.push(normalizeResponse(
+              { data: { name: `(Mã ${port1Codes[i]})`, address: err.message } },
+              port1Codes[i],
+              provider
+            ))
+          }
+
+          // Update results progressively
+          onResults([...results])
+          
+          if (i < port1Codes.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 2000))
+          }
         }
       }
 
-      toast({
-        title: "Tra cứu hoàn tất",
-        description: `Đã tra cứu ${results.length} mã khách hàng.`,
-      })
-    } catch (error: any) {
-      toast({
-        title: "Lỗi tra cứu",
-        description: error.message,
-        variant: "destructive",
-      })
+      onResults(results)
+    } catch (err: any) {
+      setError(`Lỗi tra cứu: ${err.message}`)
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Search className="h-5 w-5" />
           Tra Cứu Hóa Đơn
         </CardTitle>
+        <CardDescription>
+          Tra cứu hóa đơn điện qua 2 cổng API
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="provider">Nhà cung cấp:</Label>
           <Select value={provider} onValueChange={setProvider}>
@@ -170,7 +242,7 @@ export function BillLookup({ onResults }: BillLookupProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {PROVIDERS.map((p) => (
+              {providers.map((p) => (
                 <SelectItem key={p.value} value={p.value}>
                   {p.label}
                 </SelectItem>
@@ -180,19 +252,21 @@ export function BillLookup({ onResults }: BillLookupProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="accounts">Mã khách hàng (mỗi dòng một mã):</Label>
+          <Label htmlFor="accounts">Mã khách hàng:</Label>
           <Textarea
             id="accounts"
             value={accounts}
             onChange={(e) => setAccounts(e.target.value)}
-            placeholder="Nhập mã KH (PB/PA... hoặc số thuê bao)"
+            placeholder="Nhập mã KH (PB/PA... cho Gateway 1, số hợp đồng cho Gateway 2)"
             rows={4}
+            className="resize-none"
           />
         </div>
 
         <div className="flex gap-2">
           <Button
             variant="outline"
+            size="sm"
             onClick={handleFilterDuplicates}
             className="flex-1"
           >
@@ -203,7 +277,7 @@ export function BillLookup({ onResults }: BillLookupProps) {
 
         <Button
           onClick={handleLookup}
-          disabled={isLoading}
+          disabled={isLoading || !accounts.trim()}
           className="w-full"
         >
           {isLoading ? (
@@ -213,7 +287,7 @@ export function BillLookup({ onResults }: BillLookupProps) {
             </>
           ) : (
             <>
-              <Search className="mr-2 h-4 w-4" />
+              <Zap className="mr-2 h-4 w-4" />
               Tra cứu
             </>
           )}
@@ -221,73 +295,4 @@ export function BillLookup({ onResults }: BillLookupProps) {
       </CardContent>
     </Card>
   )
-}
-
-function normalizePort1Response(data: any, account: string, provider_id: string): BillData {
-  const bills = Array.isArray(data.bills) ? data.bills : []
-  const curr = +data.statement_closing || +bills[0]?.amount || 0
-  const prev = +bills[1]?.amount || 0
-  const total = +data.total_bill_amount || curr
-
-  return {
-    key: `${provider_id}::${account}`,
-    account: account,
-    name: data.name || '-',
-    address: data.address || '-',
-    amount_current: String(curr),
-    amount_previous: String(prev),
-    total: String(total),
-    provider_id,
-    raw_data: data
-  }
-}
-
-function normalizePort2Response(data: any, account: string, provider_id: string): BillData {
-  // Handle Port 2 response structure
-  if (data.success && data.data && data.data.success && data.data.data && data.data.data.bills) {
-    if (data.data.data.bills.length > 0) {
-      const bill = data.data.data.bills[0]
-      return {
-        key: `${provider_id}::${account}`,
-        account: account,
-        name: bill.customerName || '-',
-        address: bill.address || '-',
-        amount_current: String(bill.moneyAmount || '0'),
-        amount_previous: '0',
-        total: String(bill.moneyAmount || '0'),
-        provider_id,
-        raw_data: data.data.data
-      }
-    } else {
-      return {
-        key: `${provider_id}::${account}`,
-        account: account,
-        name: `(Mã ${account})`,
-        address: 'Không nợ cước',
-        amount_current: '0',
-        amount_previous: '0',
-        total: '0',
-        provider_id,
-        raw_data: data.data.data
-      }
-    }
-  }
-
-  // Handle error cases
-  let errorMsg = data.error?.message || data.details || 'Lỗi tra cứu C2'
-  if (data.data && data.data.error) {
-    errorMsg = data.data.error.message || 'Lỗi không xác định C2'
-  }
-
-  return {
-    key: `${provider_id}::${account}`,
-    account: account,
-    name: `(Mã ${account})`,
-    address: errorMsg,
-    amount_current: '0',
-    amount_previous: '0',
-    total: '0',
-    provider_id,
-    raw_data: { error: errorMsg }
-  }
 }

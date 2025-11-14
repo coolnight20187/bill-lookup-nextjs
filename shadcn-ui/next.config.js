@@ -1,16 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  trailingSlash: false,
   experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js']
-  },
-  async generateBuildId() {
-    return 'build-' + Date.now()
+    serverComponentsExternalPackages: ['bcrypt', 'pg']
   },
   env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    DATABASE_URL: process.env.DATABASE_URL,
     API_BASE_URL: process.env.API_BASE_URL,
     API_GET_BILL_PATH: process.env.API_GET_BILL_PATH,
     API_COOKIE: process.env.API_COOKIE,
